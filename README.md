@@ -30,10 +30,8 @@ Testing-BizTrips/
 3. JDK und Maven korrekt konfigurieren.
 
 ## Tests ausführen
-- IntelliJ: Rechtsklick auf `test`-Ordner → **Run 'Tests'**
-- Maven: 
    ```bash
-   mvn test
+   npm test a
    ```
 
 ## Autoren
