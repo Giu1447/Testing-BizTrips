@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// functional component TripList, deconstruct props!
-function TripList({ addToWishlist }) {
-    const [month, setMonth] = useState("");
-    const [trips, setTrips] = useState([]); // Initialize trips as an empty array
-    const [loading, setLoading] = useState(true); // Loading state
-    const [error, setError] = useState(null); // Error state
-    const months = ["Idle", "Jan", "Feb", "March", "April", "Mai", "June"];
+// Funktion zum Abrufen der Reisen
+export async function getBusinessTrips() {
+    const response = await fetch("http://localhost:3001/trips");
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return await response.json();
+}
 
-    // Fetch trips from API on component mount
+// benutzerdefinierter Hook zum Abrufen der Daten
+export function useFetch(url) {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     useEffect(() => {
-        const fetchTrips = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3001/trips");
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-                setTrips(data);
+                const result = await getBusinessTrips(url); // Verwenden der Funktion zum Abrufen der Reisen
+                setData(result);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -26,24 +28,29 @@ function TripList({ addToWishlist }) {
             }
         };
 
-        fetchTrips();
-    }, []); // Empty dependency array ensures this runs only once on mount
+        fetchData();
+    }, [url]);
 
-    // Map trips into JSX elements
-    const tripsMapped = trips.map((trip) => (
-        <Trip addToWishlist={addToWishlist} trip={trip} key={trip.id} />
-    ));
+    return { data, loading, error };
+}
 
+// Hauptkomponente TripList
+function TripList({ addToWishlist }) {
+    const [month, setMonth] = useState("");
+    const { data: trips, loading, error } = useFetch("http://localhost:3001/trips"); // Verwende den benutzerdefinierten Hook
+    const months = ["Idle", "Jan", "Feb", "March", "April", "Mai", "June"];
+
+    // Wenn ein Monat ausgewählt ist, filtere die Reisen nach dem ausgewählten Monat
+    const filteredTrips = month
+        ? trips?.filter((t) => new Date(t.startTrip).getMonth() + 1 === parseInt(month))
+        : trips;
+
+    // Falls die Liste leer ist
     const empty = (
         <section>
             <p className="alert alert-info">Trip list is empty</p>
         </section>
     );
-
-    // If a month is selected, filter trips by the selected month
-    const filteredTrips = month
-        ? trips.filter((t) => new Date(t.startTrip).getMonth() + 1 === parseInt(month))
-        : trips;
 
     return (
         <div className="container">
@@ -57,7 +64,7 @@ function TripList({ addToWishlist }) {
                             <label htmlFor="month">Filter by Month:</label>
                             <select
                                 id="month"
-                                value={month} // controlled component
+                                value={month} // kontrollierte Komponente
                                 onChange={(e) => {
                                     setMonth(e.target.value);
                                 }}
@@ -80,7 +87,7 @@ function TripList({ addToWishlist }) {
                             )}
                         </section>
                         <div className="row">
-                            {filteredTrips.length > 0
+                            {filteredTrips?.length > 0
                                 ? filteredTrips.map((trip) => (
                                     <Trip
                                         addToWishlist={addToWishlist}
@@ -97,7 +104,7 @@ function TripList({ addToWishlist }) {
     );
 }
 
-// deconstruct ...props
+// Trip-Komponente
 function Trip({ addToWishlist, ...props }) {
     const { trip } = props;
     const { id, title, description, startTrip, endTrip } = trip;
@@ -130,3 +137,4 @@ function Trip({ addToWishlist, ...props }) {
 }
 
 export default TripList;
+
