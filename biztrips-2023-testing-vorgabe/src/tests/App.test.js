@@ -103,7 +103,7 @@ describe("User Interactions", () => {
         })
     );
 
-    render(<App />);
+    render(<App/>);
 
     // Finde den Add-to-Wishlist-Button für den Trip "Trip to Paris"
     const addButton = await screen.findByRole("button", {
@@ -138,13 +138,43 @@ describe("User Interactions", () => {
         <Wishlist
             wishlist={mockWishlist}
             removeFromWishlist={mockRemoveFromWishlist}
-            clearWishlist={() => {}}
+            clearWishlist={() => {
+            }}
         />
     );
 
-    const deleteButton = screen.getByRole("button", { name: /delete item/i });
+    const deleteButton = screen.getByRole("button", {name: /delete item/i});
     fireEvent.click(deleteButton);
 
     expect(mockRemoveFromWishlist).toHaveBeenCalled();
   });
+
+  test("clears the wishlist", async () => {
+    const mockWishlist = [
+      {
+        id: 1,
+        title: "Trip to Berlin",
+        description: "City tour",
+        startTrip: new Date(2024, 2, 15),
+        endTrip: new Date(2024, 2, 20),
+      },
+    ];
+
+    const mockClearWishlist = jest.fn();
+
+    render(
+        <Wishlist
+            wishlist={mockWishlist}
+            removeFromWishlist={() => {
+            }}
+            clearWishlist={mockClearWishlist}
+        />
+    );
+
+    const clearButton = screen.getByRole("button", {name: /empty wishlist/i});
+    fireEvent.click(clearButton);
+
+    expect(mockClearWishlist).toHaveBeenCalled();
+  });
+
 });

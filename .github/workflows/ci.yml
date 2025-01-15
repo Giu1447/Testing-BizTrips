@@ -29,4 +29,4 @@ jobs:
       - name: Run tests
         run: |
           cd biztrips-2023-testing-vorgabe  # Wechsel nochmal ins Unterverzeichnis, falls erforderlich
-          npm test  # Führt die Tests aus
+          npm test a # Führt die Tests aus

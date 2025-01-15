@@ -64,7 +64,7 @@ function TripList({ addToWishlist }) {
                             <label htmlFor="month">Filter by Month:</label>
                             <select
                                 id="month"
-                                value={month} // kontrollierte Komponente
+                                value={month}
                                 onChange={(e) => {
                                     setMonth(e.target.value);
                                 }}
