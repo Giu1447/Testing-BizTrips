@@ -1,0 +1,32 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main  # oder der Name des Branches, auf den du pushen möchtest
+  pull_request:
+    branches:
+      - main  # oder der Name des Branches, auf den du Pull Requests machst
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Verwende Ubuntu als Host für die Tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2  # Klont das Repository
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Gebe die Node-Version an, die du verwendest
+
+      - name: Install dependencies
+        run: |
+          cd biztrips-2023-testing-vorgabe  # Wechsel ins Unterverzeichnis
+          npm install  # Installiert die Abhängigkeiten
+
+      - name: Run tests
+        run: |
+          cd biztrips-2023-testing-vorgabe  # Wechsel nochmal ins Unterverzeichnis, falls erforderlich
+          npm test  # Führt die Tests aus
